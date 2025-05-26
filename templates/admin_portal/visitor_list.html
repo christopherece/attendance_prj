@@ -1,0 +1,79 @@
+{% extends 'admin_portal/base.html' %}
+
+{% block title %}Visitor List - Admin Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Visitor List</h1>
+        <a href="{% url 'export_visitors' %}" class="btn btn-success">
+            <i class="fas fa-file-export mr-2"></i>Export to CSV
+        </a>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold">All Visitors</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="visitorsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Visiting</th>
+                            <th>Login Date</th>
+                            <th>Signout Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in visitors %}
+                        <tr>
+                            <td>{{ visitor.name }}</td>
+                            <td>{{ visitor.person_to_visit.name }}</td>
+                            <td>{{ visitor.login_date }}</td>
+                            <td>{{ visitor.signout_date|default:"-" }}</td>
+                            <td>
+                                {% if visitor.is_signin %}
+                                <span class="badge badge-success">Signed In</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Signed Out</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No visitors found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#visitorsTable').DataTable({
+            "order": [[2, "desc"]], // Sort by login date (descending)
+            "language": {
+                "search": "Search:",
+                "lengthMenu": "Show _MENU_ entries",
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                "infoEmpty": "Showing 0 to 0 of 0 entries",
+                "infoFiltered": "(filtered from _MAX_ total entries)"
+            }
+        });
+    });
+</script>
+{% endblock %}

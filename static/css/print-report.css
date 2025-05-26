@@ -1,0 +1,92 @@
+/* Print-specific styles for reports */
+@media print {
+    /* Hide elements not needed for printing */
+    .no-print, .no-print * {
+        display: none !important;
+    }
+    
+    /* Remove background colors and shadows */
+    body, .card {
+        background: white !important;
+        box-shadow: none !important;
+    }
+    
+    /* Ensure full width for content */
+    .container-fluid {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Adjust table styles for printing */
+    table {
+        width: 100% !important;
+        page-break-inside: auto !important;
+    }
+    
+    tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+    }
+    
+    th, td {
+        padding: 5px !important;
+    }
+    
+    /* Ensure charts print properly */
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Add page breaks before major sections */
+    .page-break-before {
+        page-break-before: always !important;
+    }
+    
+    /* Adjust headings for print */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid !important;
+    }
+    
+    /* Add header and footer */
+    @page {
+        margin: 1cm;
+    }
+    
+    /* Ensure text is black for better printing */
+    body {
+        color: #000 !important;
+        font-size: 12pt;
+    }
+    
+    /* Format links for print */
+    a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+    
+    /* Format report title */
+    .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .print-header h1 {
+        font-size: 18pt;
+        margin-bottom: 5px;
+    }
+    
+    .print-header p {
+        font-size: 10pt;
+    }
+    
+    /* Format report footer */
+    .print-footer {
+        text-align: center;
+        font-size: 8pt;
+        margin-top: 20px;
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+    }
+}

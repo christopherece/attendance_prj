@@ -1,0 +1,213 @@
+{% extends 'admin_portal/base.html' %}
+
+{% block title %}Custom Report - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Custom Report</h1>
+        <div>
+            {% if has_data %}
+            <button class="btn btn-secondary mr-2 no-print" onclick="window.print();">
+                <i class="fas fa-print"></i>Print Report
+            </button>
+            {% endif %}
+            <a href="{% url 'daily_report' %}" class="btn btn-outline-primary mr-2 no-print">
+                <i class="fas fa-calendar-day mr-2"></i>Daily Report
+            </a>
+            <a href="{% url 'weekly_report' %}" class="btn btn-outline-primary mr-2 no-print">
+                <i class="fas fa-calendar-week mr-2"></i>Weekly Report
+            </a>
+            <a href="{% url 'monthly_report' %}" class="btn btn-outline-primary no-print">
+                <i class="fas fa-calendar-alt mr-2"></i>Monthly Report
+            </a>
+        </div>
+    </div>
+    
+    <!-- Date Range Selector -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold">Select Date Range</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="form-inline justify-content-center">
+                <div class="form-group mr-2">
+                    <label for="start_date" class="mr-2">Start Date:</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                </div>
+                <div class="form-group">
+                    <label for="end_date" class="mr-2">End Date:</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                </div>
+                <button type="submit" class="btn btn-primary ml-2">
+                    <i class="fas fa-search mr-2"></i>Generate Report
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    {% if has_data %}
+    <!-- Summary Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold">Summary for {{ start_date }} to {{ end_date }}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <h5>Total Visitors</h5>
+                            <h2 class="text-primary">{{ total_visitors }}</h2>
+                        </div>
+                        <div class="col-md-8">
+                            <canvas id="staffChart" width="100%" height="50"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Visitors Table -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="m-0 font-weight-bold">Visitor Details</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="visitorsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Visiting</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in visitors %}
+                        <tr>
+                            <td>{{ visitor.name }}</td>
+                            <td>{{ visitor.person_to_visit.name }}</td>
+                            <td>{{ visitor.login_date|date:"M d, Y" }}</td>
+                            <td>{{ visitor.login_date|time:"H:i" }}</td>
+                            <td>
+                                {% if visitor.is_signin %}
+                                <span class="badge badge-success">Signed In</span>
+                                {% else %}
+                                <span class="badge badge-secondary">Signed Out</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No visitors for this date range</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- No Data Message -->
+    {% if start_date and end_date %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle mr-2"></i>
+        No data found for the selected date range. Please try a different range.
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle mr-2"></i>
+        Please select a date range to generate a custom report.
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if has_data %}
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#visitorsTable').DataTable({
+            "order": [[2, "asc"], [3, "asc"]], // Sort by date (ascending), then time (ascending)
+            "language": {
+                "search": "Search:",
+                "lengthMenu": "Show _MENU_ entries",
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                "infoEmpty": "Showing 0 to 0 of 0 entries",
+                "infoFiltered": "(filtered from _MAX_ total entries)"
+            }
+        });
+        
+        // Staff Distribution Chart
+        var staffCtx = document.getElementById('staffChart').getContext('2d');
+        var staffNames = {{ staff_names|safe }};
+        var staffCounts = {{ staff_counts|safe }};
+        
+        var staffChart = new Chart(staffCtx, {
+            type: 'horizontalBar',
+            data: {
+                labels: staffNames,
+                datasets: [{
+                    label: 'Number of Visits',
+                    data: staffCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)',
+                        'rgba(201, 203, 207, 0.5)',
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(201, 203, 207, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Visits'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Staff Member'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

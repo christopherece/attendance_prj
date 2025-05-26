@@ -1,0 +1,280 @@
+{% extends 'admin_portal/base.html' %}
+
+{% block title %}Dashboard - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h2 mb-4">Dashboard</h1>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-dashboard primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Today's Visitors</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ visitors_today }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-dashboard success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                This Week</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ visitors_week }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-week fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-dashboard warning h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                This Month</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ visitors_month }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-dashboard danger h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Total Staff</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_staff }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold">Visitor Activity (Last 7 Days)</h6>
+                </div>
+                <div class="card-body">
+                    <!-- Increased chart height to 400 pixels for better visibility -->
+                    <div style="height: 400px;">
+                        <canvas id="visitorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold">Top Visited Staff</h6>
+                </div>
+                <div class="card-body">
+                    {% if top_staff %}
+                    <ul class="list-group">
+                        {% for staff in top_staff %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ staff.name }}
+                            <span class="badge badge-primary badge-pill">{{ staff.visit_count }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center">No data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Visitors Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold">Recent Visitors</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Visiting</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for visitor in recent_visitors %}
+                                <tr>
+                                    <td>{{ visitor.name }}</td>
+                                    <td>{{ visitor.person_to_visit.name }}</td>
+                                    <td>{{ visitor.login_date }}</td>
+                                    <td>
+                                        {% if visitor.is_signin %}
+                                        <span class="badge badge-success">Signed In</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Signed Out</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No recent visitors</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Visitor Activity Chart
+    var ctx = document.getElementById('visitorChart').getContext('2d');
+    
+    // Parse the JSON data safely
+    var visitorDataJson = '{{ visitor_counts_by_day|escapejs }}';
+    var visitorData = JSON.parse(visitorDataJson);
+    
+    // Initialize arrays for chart data
+    var labels = [];
+    var data = [];
+    
+    // Process data in reverse to show oldest to newest
+    for (var i = visitorData.length - 1; i >= 0; i--) {
+        labels.push(visitorData[i].date);
+        data.push(visitorData[i].count);
+    }
+    
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Visitors',
+                data: data,
+                backgroundColor: 'rgba(78, 115, 223, 0.2)',  // Slightly more opaque background
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 3,  // Thicker line
+                pointRadius: 6,  // Larger points
+                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointBorderColor: '#fff',  // White border around points
+                pointBorderWidth: 2,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointHoverBorderColor: '#fff',
+                pointHitRadius: 10,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: {
+                        display: true,  // Show grid lines
+                        color: 'rgba(0, 0, 0, 0.05)'  // Light grid lines
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        padding: 10
+                    },
+                    ticks: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0,
+                        font: {
+                            size: 12
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Visitors',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        padding: 10
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'  // Light grid lines
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        },
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    padding: 12,
+                    displayColors: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

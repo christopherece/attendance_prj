@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <!-- Centered content -->
+    <div class="container my-5">
+        <div class="container d-flex justify-content-center align-items-center flex-grow-1">
+            <!-- Notifications -->
+            {% if messages %}
+                <div id="notification" class="notification position-fixed" style="top: 20px; right: 20px; z-index: 1050;">
+                    {% for message in messages %}
+                        <div class="alert alert-info alert-dismissible fade show shadow-sm" style="border-radius: 10px; background: rgba(255, 255, 255, 0.95);">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <h5 class="mb-0">{{ message }}</h5>
+                        </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    // Hide notifications after 3 seconds
+                    setTimeout(function() {
+                        var notification = document.getElementById('notification');
+                        if (notification) {
+                            notification.style.display = 'none';
+                        }
+                    }, 5000); // 5000 milliseconds = 5 seconds
+                    
+                    // Update date and time
+                    function updateDateTime() {
+                        const now = new Date();
+                        
+                        // Format date: Monday, May 20, 2025
+                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                        const dateStr = now.toLocaleDateString('en-US', options);
+                        
+                        // Format time: 11:37 PM
+                        const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+                        const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+                        
+                        // Update the display elements
+                        document.getElementById('dateDisplay').textContent = dateStr;
+                        document.getElementById('clockDisplay').textContent = timeStr;
+                    }
+                    
+                    // Update immediately and then every second
+                    updateDateTime();
+                    setInterval(updateDateTime, 1000);
+                </script>
+            {% endif %}
+            
+            <!-- Main Card -->
+            <div class="col-lg-10 col-md-11 col-sm-12">
+                <div class="card shadow" style="background: rgba(255, 255, 255, 0.95); border: none; border-radius: 20px; overflow: hidden; margin: 0 auto;">
+                    <!-- Card Header -->
+                    <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+                        <img src="{% static 'img/topit.png' %}" style="width: 180px; height: auto; display: block; margin: 0 auto 15px;" alt="TopIT Solutions Logo">
+                        <h2 class="text-white font-weight-bold mb-0" style="font-size: 2rem; letter-spacing: 0.5px;">Visitor Management</h2>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="card-body p-3 text-center">
+                        <!-- Current Date and Time -->
+                        <div class="date-time-container mb-4" style="background-color: #f8f9fa; border-radius: 10px; padding: 10px;">
+                            <div class="date-display mb-1">
+                                <small class="text-muted">Date:</small>
+                                <span id="dateDisplay" class="ml-1 font-weight-bold" style="color: #007bff; font-size: 0.9rem;"></span>
+                            </div>
+                            <div class="time-display">
+                                <small class="text-muted">Time:</small>
+                                <span id="clockDisplay" class="ml-1 font-weight-bold" style="color: #007bff; font-size: 1.2rem;"></span>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mb-3" style="color: #333; font-weight: 600; font-size: 1.3rem;">Welcome</h4>
+                        
+                        <div class="divider mb-4" style="height: 1px; background: linear-gradient(to right, transparent, rgba(0,123,255,0.3), transparent);"></div>
+                        
+                        <!-- Buttons in a horizontal layout -->
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'login_visitor' %}" class="btn btn-primary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; min-width: 140px; background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                            </a>
+                            <a href="{% url 'signout_visitor' %}" class="btn btn-outline-secondary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; min-width: 140px;">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                            </a>
+                        </div>
+                        
+                        <div class="divider mt-3 mb-3" style="height: 1px; background: linear-gradient(to right, transparent, rgba(0,123,255,0.3), transparent);"></div>
+                        
+                        <p class="text-muted mb-0" style="font-size: 0.8rem;">TopIT Solutions © 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = 'https://visitorpass.topitsolutions.co.nz/';
+            // window.location.href = 'http://localhost:8000/';
+
+        }, 60000); // 3000 milliseconds = 3 seconds
+    </script>
+{% endblock %}

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # PostgreSQL service
+  web-postgres:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: visitorpass:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - USE_SQLITE=False
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+
+  # SQLite-only service (no PostgreSQL dependency)
+  web-sqlite:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: visitorpass:sqlite
+    restart: always
+    ports:
+      - "8001:8000"  # Using a different port to avoid conflict
+    env_file:
+      - .env
+    environment:
+      - USE_SQLITE=True
+      - DATABASE_URL=
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+      - sqlite_data:/app/db.sqlite3
+
+  # PostgreSQL database
+  db:
+    image: postgres:14-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  sqlite_data:

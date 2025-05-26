@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <style>
+    /* Additional styles to ensure footer sticks to bottom */
+    #content-wrapper {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+  </style>
+  <div id="content-wrapper">
+  <div class="container d-flex justify-content-center align-items-center flex-grow-1"> <!-- Centered container that grows to fill available space -->
+    <div class="row justify-content-center w-100"> <!-- Ensure row takes full width -->
+      <!-- Combined Card -->
+      <div class="col-lg-10 col-md-11 mb-4">
+        <div class="card shadow w-100" style="background: rgba(255, 255, 255, 0.95); border: none; border-radius: 20px; overflow: hidden;">
+          <!-- Card Header -->
+          <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+            <img src="{% static 'img/logo.png' %}" style="width: 180px; height: auto; display: block; margin: 0 auto 15px;" alt="TopIT Solutions Logo">
+            <h2 class="text-white font-weight-bold mb-0" style="font-size: 2rem; letter-spacing: 0.5px;">Visitor Management System</h2>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="card-body p-4">
+            {% if success_message %}
+              <div id="successAlert" class="alert alert-success text-center mb-4" style="background-color: #28a745; color: white; border: none; border-radius: 8px;">
+                {{ success_message }}
+              </div>
+            {% endif %}
+          <div class="card-body p-4">
+            <div class="row">
+              <!-- Left Side: Visitor Information -->
+              <div class="col-lg-4 col-md-5 border-right">
+                <div class="text-center">
+                  <h3 class="mb-4" style="color: #333; font-weight: 600; font-size: 1.5rem;">Visitor Information</h3>
+                  
+                  <!-- Date Display -->
+                  <div class="date mb-3">
+                    <p class="text-muted mb-1" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Today's Date</p>
+                    <span id="dateDisplay" class="h4 font-weight-bold text-primary"></span>
+                  </div>
+                  
+                  <!-- Clock Display -->
+                  <div class="clock mb-4">
+                    <p class="text-muted mb-1" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Current Time</p>
+                    <span id="clockDisplay" class="display-4 font-weight-bold text-dark"></span>
+                  </div>
+                  
+                  <hr class="my-4" style="border-top: 2px solid rgba(0, 123, 255, 0.3);">
+                  
+                  <!-- Assistance Information -->
+                  <div class="assistance-info my-4">
+                    <h5 class="text-dark mb-3" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+                      <i class="fas fa-phone-alt mr-2 text-primary"></i>For assistance, please call:
+                    </h5>
+                    <h3 class="text-dark" style="font-size: 1.8rem; letter-spacing: 1px;">
+                      093-123-456
+                    </h3>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Right Side: Login Form -->
+              <div class="col-lg-8 col-md-7">
+          
+                <h2 class="text-center mb-4" style="color: #333; font-weight: 600; font-size: 2rem; letter-spacing: 0.5px;">Welcome, Visitor!</h2>
+                
+                <form method="post">
+                  {% csrf_token %}
+                  
+                  <!-- Name Field -->
+                  <div class="form-group mb-4">
+                    <label for="{{ form.name.id_for_label }}" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
+                      <i class="fas fa-user mr-2 text-primary"></i>Your Name:
+                    </label>
+                    <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.auto_id }}" class="form-control form-control-lg rounded-pill" {% if form.name.value %}value="{{ form.name.value }}"{% endif %} required>
+                  </div>
+                  
+                  <!-- Person to Visit Field -->
+                  <div class="form-group mb-4">
+                    <label for="id_person_to_visit_search" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
+                      <i class="fas fa-id-badge mr-2 text-primary"></i>Person to Visit:
+                    </label>
+                    <input type="text" name="person_to_visit_search" id="id_person_to_visit_search" class="form-control form-control-lg rounded-pill" placeholder="Search for staff member..." autocomplete="off">
+                    {{ form.person_to_visit }}
+                    {{ form.person_to_visit_id }}
+                    <div id="search-results-container" class="mt-2">
+      <div id="search-results" class="list-group shadow-sm" style="max-height: 200px; overflow-y: auto; display: none; border-radius: 15px;"></div>
+      <div id="no-results-message" class="text-center text-muted" style="display: none; padding: 1rem;">
+        No staff member found with that name
+      </div>
+    </div>
+                  </div>
+                  
+                  <!-- Action Buttons -->
+                  <div class="row mt-5">
+                    <div class="col-md-4 pr-md-2">
+                      <a href="{% url 'signout_visitor' %}" class="btn btn-outline-danger btn-lg btn-block" style="border-radius: 50px; font-weight: 600; letter-spacing: 0.5px;">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                      </a>
+                    </div>
+                    <div class="col-md-8 pl-md-2">
+                      <button type="submit" class="btn btn-primary btn-lg btn-block" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-remove success notification after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      const successAlert = document.getElementById('successAlert');
+      if (successAlert) {
+        setTimeout(function() {
+          successAlert.style.opacity = '0';
+          setTimeout(function() {
+            successAlert.remove();
+          }, 300);
+        }, 5000);
+      }
+    });
+  </script>
+  </div>
+
+  <script>
+    // Clock and Date Display
+    function updateClock() {
+      const clockDisplay = document.getElementById('clockDisplay');
+      const dateDisplay = document.getElementById('dateDisplay');
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const date = now.toDateString();
+      
+      clockDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+      dateDisplay.textContent = date;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Redirect after 60 seconds
+    setTimeout(function() {
+      window.location.href = 'https://visitorpass.topitsolutions.co.nz/';
+    }, 60000);
+
+    // Live search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('id_person_to_visit_search');
+      const searchResults = document.getElementById('search-results');
+      const noResultsMessage = document.getElementById('no-results-message');
+      const personToVisitInput = document.getElementById('id_person_to_visit');
+      const personToVisitIdInput = document.getElementById('id_person_to_visit_id');
+      let debounceTimer;
+
+      // Function to perform the search
+      function performSearch(query) {
+        if (query.length < 2) {
+          searchResults.style.display = 'none';
+          noResultsMessage.style.display = 'none';
+          return;
+        }
+
+        fetch(`/search-staff/?query=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            searchResults.innerHTML = '';
+            if (data.length > 0) {
+              data.forEach(staff => {
+                const item = document.createElement('a');
+                item.href = '#';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = staff.name;
+                item.dataset.id = staff.id;
+                item.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  searchInput.value = staff.name;
+                  personToVisitInput.value = staff.id;
+                  personToVisitIdInput.value = staff.id;
+                  searchResults.style.display = 'none';
+                });
+                searchResults.appendChild(item);
+              });
+              searchResults.style.display = 'block';
+            } else {
+              searchResults.style.display = 'none';
+              noResultsMessage.style.display = 'block';
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            searchResults.style.display = 'none';
+            noResultsMessage.style.display = 'block';
+          });
+      }
+
+      // Add event listener for input changes with debounce
+      searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => performSearch(query), 300);
+      });
+
+      // Hide search results when clicking outside
+      document.addEventListener('click', function(e) {
+        if (e.target !== searchInput && e.target !== searchResults) {
+          searchResults.style.display = 'none';
+        }
+      });
+
+      // Show results again when focusing on the search input
+      searchInput.addEventListener('focus', function() {
+        const query = this.value.trim();
+        if (query.length >= 2) {
+          performSearch(query);
+        }
+      });
+    });
+  </script>
+{% endblock %}

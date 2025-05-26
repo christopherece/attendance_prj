@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <div class="container my-5">
+        <div class="container d-flex justify-content-center align-items-center flex-grow-1">
+            <!-- Main Card -->
+            <div class="col-lg-10 col-md-11 col-sm-12">
+                <div class="card shadow" style="background: rgba(255, 255, 255, 0.95); border: none; border-radius: 20px; overflow: hidden;">
+                    <!-- Card Header -->
+                    <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+                        <img src="{% static 'img/logo.png' %}" style="width: 180px; height: auto; display: block; margin: 0 auto 15px;" alt="TopIT Solutions Logo">
+                        <h2 class="text-white font-weight-bold mb-0" style="font-size: 2rem; letter-spacing: 0.5px;">Visitor Sign Out</h2>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="card-body p-4">
+                        <h4 class="text-center mb-4" style="color: #333; font-weight: 600;">Please select your name to sign out</h4>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="logOut" style="border-radius: 10px; overflow: hidden;">
+                                <thead style="background-color: #f8f9fa;">
+                                    <tr>
+                                        <th scope="col" class="font-weight-bold">Name</th>
+                                        <th scope="col" class="font-weight-bold">Date of Visit</th>
+                                        <th scope="col" class="font-weight-bold text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for visitor in visitors %}
+                                        <tr>
+                                            <td class="align-middle">{{visitor.name}}</td>
+                                            <td class="align-middle">{{visitor.login_date}}</td>
+                                            <td class="text-center">
+                                                <button 
+                                                    type="button" 
+                                                    class="btn btn-outline-danger logoutButton" 
+                                                    data-id="{{ visitor.id }}"
+                                                    style="border-radius: 50px; font-weight: 600; padding: 8px 20px;"
+                                                >
+                                                    <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="3" class="text-center py-4">
+                                                <div class="alert alert-info mb-0">
+                                                    <i class="fas fa-info-circle mr-2"></i>No visitors currently signed in
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary" style="border-radius: 50px; font-weight: 600; padding: 8px 25px;">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      
+      <script>
+        $(document).ready(function() {
+            $('#logOut').on("click", ".logoutButton", function(){
+                var id = $(this).data('id');
+                var signoutForm = $('#signoutForm').attr('action', '{% url "logout" 0 %}'.replace('0', id));
+
+                $('#logoutModal').modal('show');
+
+            })
+
+        });
+    </script>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = 'https://visitorpass.topitsolutions.co.nz/';
+            // window.location.href = 'http://localhost:8000/';
+
+        }, 15000); // 3000 milliseconds = 3 seconds
+    </script>
+
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content shadow" style="background: rgba(255, 255, 255, 0.98); border-radius: 20px; border: none; overflow: hidden;">
+                    <!-- Modal Header with Gradient Background -->
+                    <div class="modal-header" style="background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+                        <h5 class="modal-title text-white font-weight-bold" id="logoutModalModalLabel" style="font-size: 1.5rem; letter-spacing: 0.5px;">
+                            Confirm Sign Out
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true" style="color: #fff;">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Modal Body -->
+                    <div class="modal-body p-4">
+                        <form id="signoutForm" method="post" action="">
+                            {% csrf_token %}
+                            
+                            {% if form.errors %}
+                            <div class="alert alert-danger shadow-sm" style="border-radius: 10px;">
+                                <strong><i class="fas fa-exclamation-circle mr-2"></i>Error:</strong>
+                                <ul class="mb-0 mt-2">
+                                    {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="text-center py-3">
+                                <i class="fas fa-question-circle text-primary mb-3" style="font-size: 3rem;"></i>
+                                <h5 style="color: #333; font-weight: 600; font-size: 1.3rem;">Are you sure you want to sign out?</h5>
+                                <p class="text-muted">Thank you for visiting TopITSolutions.</p>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-center mt-4">
+                                <button type="button" class="btn btn-outline-secondary mx-2" data-dismiss="modal" style="border-radius: 50px; font-weight: 600; padding: 10px 25px;">
+                                    <i class="fas fa-times mr-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script>
+            setTimeout(function() {
+                window.location.href = 'https://visitorpass.topitsolutions.co.nz/';
+                // window.location.href = 'http://localhost:8000/';
+
+            }, 60000); // 3000 milliseconds = 3 seconds
+        </script>
+  {% endblock %}
+
