@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'visitor/base.html' %}
 {% load static %}
 
 {% block content %}
@@ -74,21 +74,19 @@
                         
                         <div class="divider mb-4" style="height: 1px; background: linear-gradient(to right, transparent, rgba(0,123,255,0.3), transparent);"></div>
                         
-                        <!-- Buttons in a horizontal layout -->
+                        <!-- Action Buttons -->
                         <div class="d-flex justify-content-center">
-                            <a href="{% url 'login_visitor' %}" class="btn btn-primary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; min-width: 140px; background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
-                                <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                            <a href="{% url 'check_in' %}" class="btn btn-primary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; min-width: 140px; background: linear-gradient(135deg, #6c5ce7, #a369ff); border: none;">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Check In
                             </a>
-                            <a href="{% url 'signout_visitor' %}" class="btn btn-outline-secondary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; min-width: 140px;">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                            <a href="{% url 'check_out_list' %}" class="btn btn-outline-secondary mx-2" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; min-width: 140px;">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Check Out
                             </a>
                         </div>
                         
                         <div class="divider mt-3 mb-3" style="height: 1px; background: linear-gradient(to right, transparent, rgba(0,123,255,0.3), transparent);"></div>
                         
-                        <p class="text-muted mb-0" style="font-size: 0.8rem;">TopIT Solutions © 2025</p>
-                            </div>
-                        </div>
+                        <p class="text-muted mb-0" style="font-size: 0.8rem;">TopIT Solutions &copy; 2025</p>
                     </div>
                 </div>
             </div>

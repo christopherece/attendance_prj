@@ -12,40 +12,40 @@
     }
   </style>
   <div id="content-wrapper">
-  <div class="container d-flex justify-content-center align-items-center flex-grow-1"> <!-- Centered container that grows to fill available space -->
-    <div class="row justify-content-center w-100"> <!-- Ensure row takes full width -->
+  <div class="container d-flex justify-content-center align-items-center flex-grow-1">
+    <div class="row justify-content-center w-100">
       <!-- Combined Card -->
       <div class="col-lg-10 col-md-11 mb-4">
         <div class="card shadow w-100" style="background: rgba(255, 255, 255, 0.95); border: none; border-radius: 20px; overflow: hidden;">
           <!-- Card Header -->
-          <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
-            <img src="{% static 'img/logo.png' %}" style="width: 180px; height: auto; display: block; margin: 0 auto 15px;" alt="TopIT Solutions Logo">
-            <h2 class="text-white font-weight-bold mb-0" style="font-size: 2rem; letter-spacing: 0.5px;">Visitor Management System</h2>
+          <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #6c5ce7, #a369ff); border: none;">
+            <img src="{% static 'img/logo.png' %}" style="width: 180px; height: auto; display: block; margin: 0 auto 15px;" alt="Childcare Logo">
+            <h2 class="text-white font-weight-bold mb-0" style="font-size: 2rem; letter-spacing: 0.5px;">Childcare Attendance</h2>
           </div>
           
           <!-- Card Body -->
           <div class="card-body p-4">
             {% if success_message %}
-              <div id="successAlert" class="alert alert-success text-center mb-4" style="background-color: #28a745; color: white; border: none; border-radius: 8px;">
+              <div id="successAlert" class="alert alert-success text-center mb-4">
                 {{ success_message }}
               </div>
             {% endif %}
-          <div class="card-body p-4">
+            
             <div class="row">
-              <!-- Left Side: Visitor Information -->
+              <!-- Left Side: Child Information -->
               <div class="col-lg-4 col-md-5 border-right">
                 <div class="text-center">
-                  <h3 class="mb-4" style="color: #333; font-weight: 600; font-size: 1.5rem;">Visitor Information</h3>
+                  <h3 class="mb-4" style="color: #333; font-weight: 600; font-size: 1.5rem;">Child Information</h3>
                   
                   <!-- Date Display -->
                   <div class="date mb-3">
-                    <p class="text-muted mb-1" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Today's Date</p>
+                    <p class="text-muted mb-1">Today's Date</p>
                     <span id="dateDisplay" class="h4 font-weight-bold text-primary"></span>
                   </div>
                   
                   <!-- Clock Display -->
                   <div class="clock mb-4">
-                    <p class="text-muted mb-1" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Current Time</p>
+                    <p class="text-muted mb-1">Current Time</p>
                     <span id="clockDisplay" class="display-4 font-weight-bold text-dark"></span>
                   </div>
                   
@@ -65,48 +65,46 @@
               
               <!-- Right Side: Login Form -->
               <div class="col-lg-8 col-md-7">
-          
-                <h2 class="text-center mb-4" style="color: #333; font-weight: 600; font-size: 2rem; letter-spacing: 0.5px;">Welcome, Visitor!</h2>
+                <h2 class="text-center mb-4" style="color: #333; font-weight: 600; font-size: 2rem; letter-spacing: 0.5px;">Welcome!</h2>
                 
                 <form method="post">
                   {% csrf_token %}
-                  
-                  <!-- Name Field -->
+                  <!-- Child Field -->
                   <div class="form-group mb-4">
-                    <label for="{{ form.name.id_for_label }}" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
-                      <i class="fas fa-user mr-2 text-primary"></i>Your Name:
+                    <label for="{{ form.child.id_for_label }}" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
+                      <i class="fas fa-child mr-2 text-primary"></i>Child Name:
                     </label>
-                    <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.auto_id }}" class="form-control form-control-lg rounded-pill" {% if form.name.value %}value="{{ form.name.value }}"{% endif %} required>
+                    <select name="{{ form.child.html_name }}" id="{{ form.child.auto_id }}" class="form-control form-control-lg rounded-pill" required>
+                      <option value="">Select a child...</option>
+                      {% for child in children %}
+                      <option value="{{ child.id }}" {% if form.child.value == child.id %}selected{% endif %}>
+                        {{ child.name }} - {{ child.class_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
                   </div>
                   
-                  <!-- Person to Visit Field -->
+                  <!-- Parent Name Field -->
                   <div class="form-group mb-4">
-                    <label for="id_person_to_visit_search" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
-                      <i class="fas fa-id-badge mr-2 text-primary"></i>Person to Visit:
+                    <label for="{{ form.parent_name.id_for_label }}" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
+                      <i class="fas fa-user mr-2 text-primary"></i>Parent Name:
                     </label>
-                    <input type="text" name="person_to_visit_search" id="id_person_to_visit_search" class="form-control form-control-lg rounded-pill" placeholder="Search for staff member..." autocomplete="off">
-                    {{ form.person_to_visit }}
-                    {{ form.person_to_visit_id }}
-                    <div id="search-results-container" class="mt-2">
-      <div id="search-results" class="list-group shadow-sm" style="max-height: 200px; overflow-y: auto; display: none; border-radius: 15px;"></div>
-      <div id="no-results-message" class="text-center text-muted" style="display: none; padding: 1rem;">
-        No staff member found with that name
-      </div>
-    </div>
+                    <input type="text" name="{{ form.parent_name.html_name }}" id="{{ form.parent_name.auto_id }}" class="form-control form-control-lg rounded-pill" {% if form.parent_name.value %}value="{{ form.parent_name.value }}"{% endif %} required>
                   </div>
                   
-                  <!-- Action Buttons -->
-                  <div class="row mt-5">
-                    <div class="col-md-4 pr-md-2">
-                      <a href="{% url 'signout_visitor' %}" class="btn btn-outline-danger btn-lg btn-block" style="border-radius: 50px; font-weight: 600; letter-spacing: 0.5px;">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
-                      </a>
-                    </div>
-                    <div class="col-md-8 pl-md-2">
-                      <button type="submit" class="btn btn-primary btn-lg btn-block" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; background: linear-gradient(135deg, #007bff, #0056b3); border: none;">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Sign In
-                      </button>
-                    </div>
+                  <!-- Notes Field -->
+                  <div class="form-group mb-4">
+                    <label for="{{ form.notes.id_for_label }}" class="font-weight-bold" style="color: #555; font-size: 1rem; letter-spacing: 0.5px;">
+                      <i class="fas fa-sticky-note mr-2 text-primary"></i>Notes:
+                    </label>
+                    <textarea name="{{ form.notes.html_name }}" id="{{ form.notes.auto_id }}" class="form-control form-control-lg rounded-pill" rows="3" placeholder="Any special notes or instructions..."></textarea>
+                  </div>
+                  
+                  <!-- Action Button -->
+                  <div class="mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" style="border-radius: 50px; font-weight: 600; padding: 10px 25px; background: linear-gradient(135deg, #6c5ce7, #a369ff); border: none;">
+                      <i class="fas fa-sign-in-alt mr-2"></i>Check In
+                    </button>
                   </div>
                 </form>
               </div>

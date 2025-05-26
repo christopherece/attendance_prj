@@ -1,0 +1,34 @@
+{% extends 'visitor/base.html' %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">Active Check-Ins</h3>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Parent Name</th>
+                    <th>Child Name</th>
+                    <th>Class</th>
+                    <th>Check-In Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances %}
+                <tr>
+                    <td>{{ attendance.parent_name }}</td>
+                    <td>{{ attendance.child.name }}</td>
+                    <td>{{ attendance.child.class_name }}</td>
+                    <td>{{ attendance.check_in_time|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'check_out' attendance.id %}" class="btn btn-sm btn-danger">Check Out</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'visitor/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Check Out Child</h3>
+            </div>
+            <div class="card-body">
+                <p>Parent: {{ attendance.parent_name }}</p>
+                <p>Child: {{ attendance.child.name }}</p>
+                <p>Class: {{ attendance.child.class_name }}</p>
+                <p>Check-in Time: {{ attendance.check_in_time|date:"M d, Y H:i" }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Confirm Check Out</button>
+                    <a href="{% url 'check_out_list' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
